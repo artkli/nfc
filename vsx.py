@@ -1,6 +1,6 @@
 import eiscp
 import time
-from h import VSHOST
+from h import VSXHOST
 
 
 TV = "tv"
