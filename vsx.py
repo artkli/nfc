@@ -14,6 +14,8 @@ PC = "game"
 USB = "usb"
 BT = "bluetooth"
 
+ST1 = 2.0
+
 
 class Vsx:
     def __init__(self, host=VSXHOST):
@@ -42,6 +44,7 @@ class Vsx:
 
     def on(self):
         if "on" in self.dev.command("power on"):
+            time.sleep(ST1)
             return True
         else:
             return False
@@ -59,6 +62,7 @@ class Vsx:
             return False
 
     def cecOn(self):
+        time.sleep(ST1)
         return self.dev.command("hdmi-cec on")
 
     def cecOff(self):

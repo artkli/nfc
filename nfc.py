@@ -1,10 +1,8 @@
 import sys
-import time
 from vsx import Vsx, CD, FM, BD, TV, SAT
 from bdp import Bdp
 from tv import Tv
 
-ST = 2.0
 VOL1 = 84
 VOL2 = 64
 
@@ -14,13 +12,16 @@ def checkOn():
     t = Tv()
 
     if v.isOn():
-        if t.isOn() and not b.isOn() and v.getSource() == SAT:
+        tOn = t.isOn()
+        bOn = b.isOn()
+        vSource = v.getSource()
+        if tOn and not bOn and vSource == SAT:
             answer = SAT
-        elif t.isOn() and b.isOn() and v.getSource() == BD:
+        elif tOn and bOn and vSource == BD:
             answer = BD
-        elif not t.isOn() and b.isOn() and v.getSource() == CD:
+        elif not tOn and bOn and vSource == CD:
             answer = CD
-        elif not t.isOn() and not b.isOn() and v.getSource() == FM:
+        elif not tOn and not bOn and vSource == FM:
             answer = FM
         else:
             answer = 'other'
@@ -30,7 +31,7 @@ def checkOn():
     t.close()
     b.close()
     v.close()
-
+    print(answer)
     return answer
 
 
@@ -39,21 +40,32 @@ if __name__ == "__main__":
         status = checkOn()
 
         if sys.argv[1].lower() == 'sat':
+            v = Vsx()
+            b = Bdp()
+
             if status == SAT:
                 Tv().off(True)
-                Vsx().off()
+                v.off()
+            elif status == 'other':
+                Tv().off()
+                v.off()
+                b.hdmiOff()
+                b.off()
             else:
-                if status == 'other':
-                    Tv().on()
-                elif Tv().isOn():
+                if status == BD:
                     Tv().decoderOn()
+                    b.hdmiOff()
+                    b.off()
+                elif status == CD:
+                    Tv().on(True)
+                    b.off()
                 else:
                     Tv().on(True)
-                Bdp().off()
-                v = Vsx()
                 v.on()
                 v.setSAT()
-                v.close()
+                v.setVolume(VOL2)
+            b.close()
+            v.close()
 
         elif sys.argv[1].lower() == 'rec':
             Tv().decoderRec()
@@ -66,14 +78,17 @@ if __name__ == "__main__":
             Tv().decoderRec()
 
         elif sys.argv[1].lower() == 'cd':
+            v = Vsx()
+            b = Bdp()
             if status == CD:
-                Bdp().off()
-                Vsx().off()
-            else:
-                b = Bdp()
-                b.on()
+                b.off()
+                v.off()
+            elif status == 'other':
+                Tv().off()
+                v.off()
                 b.hdmiOff()
-                v = Vsx()
+                b.off()
+            else:
                 v.on()
                 v.setCD()
                 v.setVolume(VOL1)
@@ -82,48 +97,57 @@ if __name__ == "__main__":
                     Tv().off(True)
                 else:
                     Tv().off()
-                time.sleep(ST)
+                b.on()
+                b.hdmiOff()
                 v.cecOn()
-                b.close()
-                v.close()
+            b.close()
+            v.close()
 
         elif sys.argv[1].lower() == 'radio':
+            v = Vsx()
+            b = Bdp()
             if status == FM:
-                Vsx().off()
+                v.off()
+            elif status == 'other':
+                Tv().off()
+                v.off()
+                b.hdmiOff()
+                b.off()
             else:
-                v = Vsx()
                 v.on()
                 v.setFM()
                 v.setVolume(VOL1)
                 v.cecOff()
-                Bdp().off()
                 if status == SAT:
                     Tv().off(True)
                 else:
                     Tv().off()
-                time.sleep(ST)
+                if status == BD:
+                    b.hdmiOff()
+                b.off()
                 v.cecOn()
-                v.close()
+            b.close()
+            v.close()
 
         elif sys.argv[1].lower() == 'film':
-            if status == BD:
-                Vsx().off()
-                b = Bdp()
+            v = Vsx()
+            b = Bdp()
+            if status == BD or status == 'other':
+                v.off()
                 b.hdmiOff()
                 b.off()
-                b.close()
                 Tv().off()
             else:
-                v = Vsx()
-                b = Bdp()
-                b.on()
-                b.hdmiOn()
                 v.on()
+                b.on()
+                if status == SAT:
+                    Tv().decoderOff()
                 v.setBD()
                 v.setVolume(VOL1)
+                b.hdmiOn()
                 Tv().on()
-                b.close()
-                v.close()
+            b.close()
+            v.close()
 
         else:
             sys.exit(1)
