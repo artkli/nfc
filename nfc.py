@@ -31,7 +31,7 @@ def checkOn():
     t.close()
     b.close()
     v.close()
-    print(answer)
+
     return answer
 
 
