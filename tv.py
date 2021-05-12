@@ -83,11 +83,13 @@ class Tv:
 
 if __name__ == "__main__":
     t = Tv()
-    print(t.isOn())
+    print("TV is ON" if t.isOn() else "TV is OFF")
+    print("starting ...")
     t.on(True)
     time.sleep(30)
-    print(t.isOn())
+    print("TV is ON" if t.isOn() else "TV is OFF")
+    print("stopping ...")
     t.off(True)
     time.sleep(10)
-    print(t.isOn())
+    print("TV is ON" if t.isOn() else "TV is OFF")
     t.close()

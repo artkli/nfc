@@ -43,17 +43,19 @@ class Vsx:
         return tuple[1]
 
     def on(self):
-        if "on" in self.dev.command("power on"):
-            time.sleep(ST1)
-            return True
-        else:
-            return False
+        if not self.isOn():
+            if "on" in self.dev.command("power on"):
+                time.sleep(ST1)
+                return True
+            else:
+                return False
 
     def off(self):
-        if "off" in self.dev.command("power off"):
-            return True
-        else:
-            return False
+        if self.isOn():
+            if "off" in self.dev.command("power off"):
+                return True
+            else:
+                return False
 
     def isOn(self):
         if "on" in self.dev.command("power query"):
@@ -117,5 +119,13 @@ class Vsx:
 
 if __name__ == "__main__":
     v = Vsx()
-    if not v.isOn():
-        v.on()
+    print("VSX is ON" if v.isOn() else "VSX is OFF")
+    print("starting ...")
+    v.on()
+    time.sleep(30)
+    print("VSX is ON" if v.isOn() else "VSX is OFF")
+    print("stopping ...")
+    v.off()
+    time.sleep(10)
+    print("VSX is ON" if v.isOn() else "VSX is OFF")
+    v.close()
