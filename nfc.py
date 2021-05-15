@@ -52,6 +52,7 @@ if __name__ == "__main__":
                 b.hdmiOff()
                 b.off()
             else:
+                v.setSAT()
                 if status == BD:
                     Tv().decoderOn()
                     b.hdmiOff()
@@ -62,7 +63,7 @@ if __name__ == "__main__":
                 else:
                     Tv().on(True)
                 v.on()
-                v.setSAT()
+                v.cecOn()
                 v.setVolume(VOL2)
             b.close()
             v.close()

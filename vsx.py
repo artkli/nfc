@@ -14,7 +14,10 @@ PC = "game"
 USB = "usb"
 BT = "bluetooth"
 
-ST1 = 2.0
+ST1 = 0.5
+ST2 = 2.0
+ST3 = 3.0
+ST4 = 10.0
 
 
 class Vsx:
@@ -45,7 +48,7 @@ class Vsx:
     def on(self):
         if not self.isOn():
             if "on" in self.dev.command("power on"):
-                time.sleep(ST1)
+                time.sleep(ST2)
                 return True
             else:
                 return False
@@ -64,7 +67,7 @@ class Vsx:
             return False
 
     def cecOn(self):
-        time.sleep(ST1)
+        time.sleep(ST3)
         return self.dev.command("hdmi-cec on")
 
     def cecOff(self):
@@ -84,7 +87,14 @@ class Vsx:
         return self.__decode(self.dev.command("source query"))
 
     def setSource(self, src):
-        return self.__decode(self.dev.command("source " + src))
+        start_time = time.time()
+        while True:
+            st = self.__decode(self.dev.command("source " + src))
+            if st != src:
+                return True
+            if time.time() - start_time > ST4:
+                return False
+            time.sleep(ST1)
     
     def setTV(self):
         return self.setSource(TV)

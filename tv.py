@@ -7,7 +7,7 @@ from h import TVHOST, TVPORT1, TVPORT2
 ST1 = 0.1
 ST2 = 0.3
 ST3 = 2.0
-
+ST4 = 10.0
 
 VOL2 = 64
 
@@ -42,13 +42,18 @@ class Tv:
                     s.close()
 
     def isOn(self):
-        if not self.__isPortOpen(TVHOST, TVPORT2):
-            return False
-        else:
-            if self.__isPortOpen():
+        start_time = time.time()
+        while True:
+            s1 = 1 if self.__isPortOpen() else 0
+            s2 = 2 if self.__isPortOpen(TVHOST, TVPORT2) else 0
+            st = s1 + s2
+            if st == 3:
                 return True
-            else:
+            elif st == 0:
                 return False
+            if time.time() - start_time > ST4:
+                return False
+            time.sleep(ST2)
 
     def on(self, decoder=False):
         if not self.isOn():

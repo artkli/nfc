@@ -96,11 +96,11 @@ class Bdp:
                 start_time = time.time()
                 while True:
                     st = self.status()
-                    time.sleep(ST4)
                     if st[0] == "P":
                         return True
                     if time.time() - start_time > ST7:
                         return False
+                    time.sleep(ST4)
             else:
                 return False
         else:
@@ -112,11 +112,11 @@ class Bdp:
                 start_time = time.time()
                 while True:
                     st = self.status()
-                    time.sleep(ST4)
                     if st[0] != "P":
                         return True
                     if time.time() - start_time > ST7:
                         return False
+                    time.sleep(ST4)
             else:
                 return False
         else:
