@@ -122,6 +122,12 @@ class Bdp:
         else:
             return False
 
+    def play(self):
+        if not self.isOn():
+            return False
+        else:
+            return self.__send(PLAY)
+
     def status(self):
         self.dev.write(MODE)
         time.sleep(ST1)
