@@ -70,7 +70,7 @@ if __name__ == "__main__":
                 time.sleep(ST1)
                 if v.getSource() != SAT:
                     t.setHdmi3()
-                     v.setSAT()
+                    v.setSAT()
 
             t.close()
             b.close()
