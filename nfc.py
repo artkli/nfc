@@ -1,5 +1,5 @@
 import sys
-from vsx import Vsx, CD, FM, BD, TV, SAT
+from vsx import Vsx, CD, AM, NET, BT, FM, BD, TV, SAT, PC
 from bdp import Bdp
 from tv import Tv
 
@@ -15,13 +15,13 @@ def checkOn():
         tOn = t.isOn()
         bOn = b.isOn()
         vSource = v.getSource()
-        if tOn and not bOn and vSource == SAT:
+        if tOn and not bOn and (vSource == SAT or vSource == TV or vSource == PC):
             answer = SAT
         elif tOn and bOn and vSource == BD:
             answer = BD
         elif not tOn and bOn and vSource == CD:
             answer = CD
-        elif not tOn and not bOn and vSource == FM:
+        elif not tOn and not bOn and (vSource == FM or vSource == AM or vSource == NET or vSource == BT):
             answer = FM
         else:
             answer = 'other'
