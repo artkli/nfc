@@ -1,8 +1,10 @@
 import sys
+import time
 from vsx import Vsx, CD, AM, NET, BT, FM, BD, TV, SAT, PC
 from bdp import Bdp
 from tv import Tv
 
+ST1 = 10.0
 VOL1 = 84
 VOL2 = 64
 
@@ -42,28 +44,35 @@ if __name__ == "__main__":
         if sys.argv[1].lower() == 'sat':
             v = Vsx()
             b = Bdp()
+            t = Tv()
 
             if status == SAT:
-                Tv().off(True)
+                t.off(True)
                 v.off()
             elif status == 'other':
-                Tv().off()
+                t.off()
                 v.off()
                 b.hdmiOff()
                 b.off()
             else:
                 if status == BD:
-                    Tv().decoderOn()
+                    t.decoderOn()
                     b.hdmiOff()
                     b.off()
                 elif status == CD:
-                    Tv().on(True)
+                    t.on(True)
                     b.off()
                 else:
-                    Tv().on(True)
+                    t.on(True)
                 v.on()
                 v.setVolume(VOL2)
                 v.setSAT()
+                time.sleep(ST1)
+                if v.getSource() != SAT:
+                    t.setHdmi3()
+                     v.setSAT()
+
+            t.close()
             b.close()
             v.close()
 

@@ -63,6 +63,10 @@ class Tv:
             self.__lircSend("tv", "KEY_POWER")
             return self.isOn()
 
+    def setHdmi3(self):
+        if self.isOn():
+            self.__lircSend("tv", "KEY_HDMI3")
+
     def off(self, decoder=False):
         if self.isOn():
             if decoder:

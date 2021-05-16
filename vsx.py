@@ -67,11 +67,18 @@ class Vsx:
             return False
 
     def cecOn(self):
-        time.sleep(ST3)
-        return self.dev.command("hdmi-cec on")
+        if "off" in self.dev.command("hdmi-cec query"):
+            time.sleep(ST3)
+            return self.dev.command("hdmi-cec on")
+        else:
+            return "on"
 
     def cecOff(self):
-        return self.dev.command("hdmi-cec off")
+        if "on" in self.dev.command("hdmi-cec query"):
+            time.sleep(ST3)
+            return self.dev.command("hdmi-cec off")
+        else:
+            return "off"
 
     def getVolume(self):
         return self.dev.command("volume query")
