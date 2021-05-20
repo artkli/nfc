@@ -8,8 +8,9 @@ ST2 = 0.2
 ST3 = 0.3
 ST4 = 0.5
 ST5 = 1.0
-ST6 = 7.0
-ST7 = 20.0
+ST6 = 3.0
+ST7 = 7.0
+ST8 = 20.0
 
 
 POWERON = b"PN\n\r"
@@ -51,7 +52,7 @@ class Bdp:
     def __send(self, command):
         self.dev.write(command)
         time.sleep(ST1)
-        answer = self.dev.read_until(b"\n", 5).decode("UTF-8")
+        answer = self.dev.read_until(b"\n", ST6).decode("UTF-8")
         if answer[0] == "R":
             return True
         else:
@@ -69,7 +70,7 @@ class Bdp:
     def hdmiOn(self):
         if not self.isOn():
             return False
-        time.sleep(ST6)
+        time.sleep(ST7)
         if not self.__sendTuple(STOPTUPLE):
             return False
         time.sleep(ST5)
@@ -81,7 +82,7 @@ class Bdp:
     def hdmiOff(self):
         if not self.isOn():
             return False
-        time.sleep(ST6)
+        time.sleep(ST7)
         if not self.__sendTuple(STOPTUPLE):
             return False
         time.sleep(ST5)
@@ -98,7 +99,7 @@ class Bdp:
                     st = self.status()
                     if st[0] == "P":
                         return True
-                    if time.time() - start_time > ST7:
+                    if time.time() - start_time > ST8:
                         return False
                     time.sleep(ST4)
             else:
@@ -114,7 +115,7 @@ class Bdp:
                     st = self.status()
                     if st[0] != "P":
                         return True
-                    if time.time() - start_time > ST7:
+                    if time.time() - start_time > ST8:
                         return False
                     time.sleep(ST4)
             else:
@@ -131,7 +132,7 @@ class Bdp:
     def status(self):
         self.dev.write(MODE)
         time.sleep(ST1)
-        answer = self.dev.read_until(b"\n", 5).decode("UTF-8")
+        answer = self.dev.read_until(b"\n", ST6).decode("UTF-8")
         return answer
 
     def isOn(self):

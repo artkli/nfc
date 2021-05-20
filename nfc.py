@@ -65,6 +65,7 @@ if __name__ == "__main__":
                 else:
                     t.on(True)
                 v.on()
+                v.cecOn()
                 v.setVolume(VOL2)
                 v.setSAT()
                 time.sleep(ST1)
@@ -153,6 +154,7 @@ if __name__ == "__main__":
                 if status == SAT:
                     Tv().decoderOff()
                 v.setBD()
+                v.cecOn()
                 v.setVolume(VOL1)
                 b.hdmiOn()
                 Tv().on()

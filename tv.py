@@ -61,7 +61,6 @@ class Tv:
                 self.__lircSend("CANAL", "POWER")
                 time.sleep(ST2)
             self.__lircSend("tv", "KEY_POWER")
-            return self.isOn()
 
     def setHdmi3(self):
         if self.isOn():
@@ -73,7 +72,6 @@ class Tv:
                 self.__lircSend("CANAL", "POWER")
                 time.sleep(ST2)
             self.__lircSend("tv", "KEY_POWER")
-            return self.isOn()
 
     def decoderRec(self):
         self.__lircSend("CANAL", "REC")
