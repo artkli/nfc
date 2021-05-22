@@ -4,7 +4,7 @@ from vsx import Vsx, CD, AM, NET, BT, FM, BD, TV, SAT, PC
 from bdp import Bdp
 from tv import Tv
 
-ST1 = 10.0
+ST1 = 3.0
 VOL1 = 84
 VOL2 = 64
 
@@ -65,12 +65,12 @@ if __name__ == "__main__":
                 else:
                     t.on(True)
                 v.on()
-                v.cecOn()
                 v.setVolume(VOL2)
                 v.setSAT()
                 time.sleep(ST1)
+                t.setHdmi3()
+                v.cecOn()
                 if v.getSource() != SAT:
-                    t.setHdmi3()
                     v.setSAT()
 
             t.close()
