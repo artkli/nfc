@@ -77,16 +77,6 @@ if __name__ == "__main__":
             b.close()
             v.close()
 
-        elif sys.argv[1].lower() == 'rec':
-            Tv().decoderRec()
-
-        elif sys.argv[1].lower() == 'list':
-            if status == SAT:
-                Tv().decoderList()
-
-        elif sys.argv[1].lower() == 'stop':
-            Tv().decoderRec()
-
         elif sys.argv[1].lower() == 'cd':
             v = Vsx()
             b = Bdp()

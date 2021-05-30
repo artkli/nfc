@@ -1,7 +1,8 @@
 import socket
 import sys
 import time
-from h import TVHOST, TVPORT1, TVPORT2
+import requests
+from h import TVHOST, DHOST, TVPORT1, TVPORT2
 
 
 ST1 = 0.1
@@ -13,7 +14,7 @@ VOL2 = 64
 
 class Tv:
     def __init__(self):
-        pass
+        self.address = 'http://' + DHOST + ':8080/control/rcu'
 
     def __del__(self):
         pass
@@ -58,7 +59,7 @@ class Tv:
     def on(self, decoder=False):
         if not self.isOn():
             if decoder:
-                self.__lircSend("CANAL", "POWER")
+                requests.post(self.address, data={'Keypress': 'Key' + 'StandBy'}, timeout=ST3)
                 time.sleep(ST2)
             self.__lircSend("tv", "KEY_POWER")
 
@@ -70,25 +71,14 @@ class Tv:
     def off(self, decoder=False):
         if self.isOn():
             if decoder:
-                self.__lircSend("CANAL", "POWER")
+                requests.post(self.address, data={'Keypress': 'Key' + 'StandBy'}, timeout=ST3)
                 time.sleep(ST2)
             self.__lircSend("tv", "KEY_POWER")
 
-    def decoderRec(self):
-        self.__lircSend("CANAL", "REC")
-
     def decoderOn(self):
-        self.__lircSend("CANAL", "POWER")
+        requests.post(self.address, data={'Keypress': 'Key' + 'StandBy'}, timeout=ST3)
 
     decoderOff = decoderOn
-
-    def decoderStop(self):
-        self.__lircSend("CANAL", "STOP")
-        time.sleep(ST2)
-        self.__lircSend("tv", "KEY_OK")
-
-    def decoderList(self):
-        self.__lircSend("CANAL", "LIST")
 
 
 if __name__ == "__main__":
