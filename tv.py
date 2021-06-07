@@ -1,9 +1,16 @@
 import socket
 import sys
+import os
 import time
 import requests
-from h import TVHOST, DHOST, TVPORT1, TVPORT2
+import wakeonlan
 
+from samsungtvws import SamsungTVWS
+
+from h import TVHOST, DHOST, TVPORT1, TVPORT2, TVARP
+
+
+sys.path.append('../')
 
 ST1 = 0.1
 ST2 = 0.3
@@ -15,19 +22,15 @@ VOL2 = 64
 class Tv:
     def __init__(self):
         self.address = 'http://' + DHOST + ':8080/control/rcu'
+        #self.tvr = SamsungTVWS(TVHOST)
+
+        token_file = os.path.dirname(os.path.realpath(__file__)) + '/tv-token'
+        self.tvr = SamsungTVWS(host=TVHOST, port=8002, token_file=token_file)
 
     def __del__(self):
         pass
     
     close = __del__    
-
-    def __lircSend(self, dev, key):
-        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        s.connect("/var/run/lirc/lircd")
-        time.sleep(ST1)
-        s.sendall("SEND_ONCE " + dev + " " + key + "\n")
-        time.sleep(ST1)
-        s.close()
 
     def __isPortOpen(self, ip=TVHOST, port=TVPORT1, timeout=ST3):
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -57,23 +60,28 @@ class Tv:
             time.sleep(ST2)
 
     def on(self, decoder=False):
-        if not self.isOn():
-            if decoder:
-                requests.post(self.address, data={'Keypress': 'Key' + 'StandBy'}, timeout=ST3)
-                time.sleep(ST2)
-            self.__lircSend("tv", "KEY_POWER")
+        if decoder:
+            requests.post(self.address, data={'Keypress': 'Key' + 'StandBy'}, timeout=ST3)
+            time.sleep(ST2)
+        start_time = time.time()
+        while True:
+            wakeonlan.send_magic_packet(TVARP)
+            if self.isOn():
+                return True
+            if time.time() - start_time > ST4:
+                return False
 
     def setHdmi3(self):
         time.sleep(ST3)
         if self.isOn():
-            self.__lircSend("tv", "KEY_HDMI3")
+            self.tvr.send_key('KEY_HDMI3')
 
     def off(self, decoder=False):
         if self.isOn():
             if decoder:
                 requests.post(self.address, data={'Keypress': 'Key' + 'StandBy'}, timeout=ST3)
                 time.sleep(ST2)
-            self.__lircSend("tv", "KEY_POWER")
+            self.tvr.shortcuts().power()
 
     def decoderOn(self):
         requests.post(self.address, data={'Keypress': 'Key' + 'StandBy'}, timeout=ST3)
