@@ -22,7 +22,6 @@ VOL2 = 64
 class Tv:
     def __init__(self):
         self.address = 'http://' + DHOST + ':8080/control/rcu'
-        #self.tvr = SamsungTVWS(TVHOST)
 
         token_file = os.path.dirname(os.path.realpath(__file__)) + '/tv-token'
         self.tvr = SamsungTVWS(host=TVHOST, port=8002, token_file=token_file)
@@ -74,7 +73,14 @@ class Tv:
     def setHdmi3(self):
         time.sleep(ST3)
         if self.isOn():
-            self.tvr.send_key('KEY_HDMI3')
+            self.tvr.send_key('KEY_SOURCE')
+            self.tvr.send_key('KEY_DOWN')
+            self.tvr.send_key('KEY_UP')
+            for i in range(10):
+                self.tvr.send_key('KEY_LEFT')
+            for i in range(3):
+                self.tvr.send_key('KEY_RIGHT')
+            self.tvr.send_key('KEY_ENTER')
 
     def off(self, decoder=False):
         if self.isOn():

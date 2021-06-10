@@ -81,7 +81,7 @@ class Vsx:
             return "off"
 
     def getVolume(self):
-        return self.dev.command("volume query")
+        return int(self.dev.command("volume query")[1])
 
     def setVolume(self, vol):
         if vol < 0:
