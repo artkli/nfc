@@ -62,16 +62,13 @@ if __name__ == "__main__":
                 elif status == CD:
                     t.on(True)
                     b.off()
+                    v.cecOn()
                 else:
                     t.on(True)
                 v.on()
                 v.setVolume(VOL2)
                 v.setSAT()
-                time.sleep(ST1)
                 t.setHdmi3()
-                v.cecOn()
-                if v.getSource() != SAT:
-                    v.setSAT()
 
             t.close()
             b.close()
