@@ -13,8 +13,8 @@ from samsungtvws import SamsungTVWS
 
 from h import TVHOST, TVTOKEN, TVNAME, TVPORT1, TVPORT2, TVPORT3, TVARP, DHOST
 
-STHOST = "api.smartthings.com"
 DNSIP  = "8.8.8.8"
+STHOST = "api.smartthings.com"
 STPORT = 443
 
 ST1 = 0.3
