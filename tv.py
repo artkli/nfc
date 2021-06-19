@@ -14,6 +14,7 @@ from samsungtvws import SamsungTVWS
 from h import TVHOST, TVTOKEN, TVNAME, TVPORT1, TVPORT2, TVPORT3, TVARP, DHOST
 
 STHOST = "api.smartthings.com"
+DNSIP  = "8.8.8.8"
 STPORT = 443
 
 ST1 = 0.3
@@ -38,7 +39,7 @@ class Tv:
     close = __del__
 
     def __isPortOpen(self, ip=TVHOST, port=TVPORT1, timeout=ST2):
-        p = ping("8.8.8.8", count=1, timeout=ST2)
+        p = ping(DNSIP, count=1, timeout=ST2)
         if p.packets_received == 0:
             return False
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
