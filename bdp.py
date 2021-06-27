@@ -42,10 +42,15 @@ class Bdp:
     def __init__(self, host=BDHOST, port=BDPORT):
         self.host = host
         self.port = port
-        self.dev = telnetlib.Telnet(self.host, self.port)
+        self.ok = True
+        try:
+            self.dev = telnetlib.Telnet(self.host, self.port)
+        except:
+            self.ok = False            
 
     def __del__(self):
-        self.dev.close()
+        if self.ok:
+            self.dev.close()
 
     close = __del__
 
@@ -92,7 +97,7 @@ class Bdp:
         return self.__sendTuple(HDMIOFF)
 
     def on(self):
-        if not self.isOn():
+        if self.ok and not self.isOn():
             if self.__send(POWERON):
                 start_time = time.time()
                 while True:
@@ -136,7 +141,7 @@ class Bdp:
         return answer
 
     def isOn(self):
-        if self.status()[0] == "P":
+        if self.ok and self.status()[0] == "P":
             return True
         else:
             return False

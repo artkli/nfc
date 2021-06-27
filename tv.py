@@ -39,7 +39,10 @@ class Tv:
     close = __del__
 
     def __isPortOpen(self, ip=TVHOST, port=TVPORT1, timeout=ST2):
-        p = ping(DNSIP, count=1, timeout=ST2)
+        try:
+            p = ping(DNSIP, count=1, timeout=ST2)
+        except:
+            return False
         if p.packets_received == 0:
             return False
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -109,7 +112,10 @@ class Tv:
                 time.sleep(ST1)            
 
     def decoderOn(self):
-        requests.post(self.address, data={'Keypress': 'Key' + 'StandBy'})
+        try:
+            requests.post(self.address, data={'Keypress': 'Key' + 'StandBy'})
+        except:
+            pass
 
     decoderOff = decoderOn
 
