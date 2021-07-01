@@ -122,17 +122,14 @@ class Tv:
     def on(self, decoder=False):
         if decoder:
             self.decoderOn()
-
-        if self.online:
-            asyncio.run(self.__on())
-        else:
-            start_time = time.time()
-            while True:
-                wakeonlan.send_magic_packet(TVARP)
-                if self.isOn():
-                    return True
-                if time.time() - start_time > ST3:
-                    return False
+        start_time = time.time()
+        while True:
+            wakeonlan.send_magic_packet(TVARP)
+            time.sleep(ST1)
+            if self.isOn():
+                return True
+            if time.time() - start_time > ST3:
+                return False
 
     def off(self, decoder=False):
         if self.isOn():
