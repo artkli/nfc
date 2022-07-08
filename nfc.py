@@ -125,7 +125,7 @@ def run(arg):
             elif v == 1:
                 deviceOn[i]()
             elif type(v) == str:
-                deviceOn[5](v)
+                deviceOn[len(ht)-1](v)
 
     if v.isOn():
         vSource = v.getSource()
