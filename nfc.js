@@ -47,6 +47,14 @@ nfc.on('reader', async reader => {
                         console.log(`SEND TV command, exit code ${code}`);
                 });
             }
+            if (sdata.includes("PC")) {
+                console.log(`${reader.reader.name}  PC string found`);
+
+                const c = spawn('python3', ['/home/pi/nfc/app/nfc.py', 'pc']);
+                c.on('close', (code) => {
+                        console.log(`SEND TV command, exit code ${code}`);
+                });
+            }
             if (sdata.includes("TV")) {
                 console.log(`${reader.reader.name}  TV string found`);
 
@@ -75,6 +83,14 @@ nfc.on('reader', async reader => {
                 console.log(`${reader.reader.name}  CD string found`);
 
                 const c = spawn('python3', ['/home/pi/nfc/app/nfc.py', 'cd']);
+                c.on('close', (code) => {
+                        console.log(`SEND CD command, exit code ${code}`);
+                });
+            }
+            if (sdata.includes("NET")) {
+                console.log(`${reader.reader.name}  CD string found`);
+
+                const c = spawn('python3', ['/home/pi/nfc/app/nfc.py', 'net']);
                 c.on('close', (code) => {
                         console.log(`SEND CD command, exit code ${code}`);
                 });

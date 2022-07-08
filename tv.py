@@ -17,11 +17,13 @@ DNSIP  = "8.8.8.8"
 STHOST = "api.smartthings.com"
 STPORT = 443
 
-ST1 = 0.3
+ST1 = 0.5
 ST2 = 2.0
-ST3 = 10.0
+ST3 = 3.0
+ST4 = 10.0
 
-VOL2 = 64
+#VOL2 = 64
+VOL2 = 84
 
 class Tv:
     def __init__(self):
@@ -38,7 +40,7 @@ class Tv:
     
     close = __del__
 
-    def __isPortOpen(self, ip=TVHOST, port=TVPORT1, timeout=ST2):
+    def __isPortOpen(self, ip=TVHOST, port=TVPORT1, timeout=ST4):
         try:
             p = ping(DNSIP, count=1, timeout=ST2)
         except:
@@ -107,28 +109,35 @@ class Tv:
                     return True
                 elif st == 0:
                     return False
-                if time.time() - start_time > ST3:
+                if time.time() - start_time > ST4:
                     return False
                 time.sleep(ST1)            
 
     def decoderOn(self):
         try:
-            requests.post(self.address, data={'Keypress': 'Key' + 'StandBy'})
+            requests.post(self.address, data={'Keypress': 'Key' + 'StandBy'}, timeout=ST3)
+            rv = True
         except:
-            pass
+            rv = False
+        return rv
 
     decoderOff = decoderOn
 
     def on(self, decoder=False):
         if decoder:
-            self.decoderOn()
+            if not self.decoderOn():
+                return False
+
+        if self.online:
+            asyncio.run(self.__on())
+
         start_time = time.time()
         while True:
             wakeonlan.send_magic_packet(TVARP)
             time.sleep(ST1)
             if self.isOn():
                 return True
-            if time.time() - start_time > ST3:
+            if time.time() - start_time > ST4:
                 return False
 
     def off(self, decoder=False):
@@ -142,17 +151,27 @@ class Tv:
     
     def setHdmi3(self):
         if self.isOn():
+            time.sleep(ST2)
             self.tvr.send_key('KEY_HOME')
             time.sleep(ST1)
             self.tvr.send_key('KEY_RIGHT')
             time.sleep(ST1)
             self.tvr.send_key('KEY_ENTER')
+            """
+            time.sleep(ST2)
+            self.tvr.send_key('KEY_RETURN')
+            time.sleep(ST1)
+            self.tvr.send_key('KEY_RETURN')
+            time.sleep(ST1)
+            self.tvr.send_key('KEY_6')
+            """
 
 
 if __name__ == "__main__":
     t = Tv()
     print(t.foundTv())
     print("TV is ON" if t.isOn() else "TV is OFF")
+    """
     print("starting ...")
     t.on(False)
     print("HDMI3 ...")
@@ -164,4 +183,5 @@ if __name__ == "__main__":
     t.off(False)
     time.sleep(10)
     print("TV is ON" if t.isOn() else "TV is OFF")
+    """
     t.close()

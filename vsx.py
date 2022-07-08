@@ -13,6 +13,7 @@ NET = "net"
 PC = "game"
 USB = "usb"
 BT = "bluetooth"
+SB = "strm-box"
 
 ST1 = 0.5
 ST2 = 2.0
@@ -37,6 +38,8 @@ class Vsx:
             return BD
         if PC in tuple[1]:
             return PC
+        if SB in tuple[1]:
+            return SB
         if NET in tuple[1]:
             return NET
         if SAT in tuple[1]:
@@ -48,7 +51,7 @@ class Vsx:
     def on(self):
         if not self.isOn():
             if "on" in self.dev.command("power on"):
-                time.sleep(ST2)
+#                time.sleep(ST2)
                 return True
             else:
                 return False
@@ -127,11 +130,21 @@ class Vsx:
     def setPC(self):
         return self.setSource(PC)
 
+    def setSB(self):
+        return self.setSource(SB)
+
     def setUSB(self):
         return self.setSource(USB)
 
     def setBT(self):
         return self.setSource(BT)
+
+    def setEnter(self):
+        try:
+            self.dev.command("setup enter")
+        except:
+            pass
+        return True
 
 
 if __name__ == "__main__":
