@@ -152,7 +152,8 @@ def run(arg):
         v.close()
         sys.exit(1)
 
-    if currentHt == newHt or currentHt not in (TELEVISION, MUSIC, RADIO, NETRADIO, FILM, BAMP1):
+    if currentHt == newHt or currentHt not in (TELEVISION, MUSIC, RADIO, NETRADIO, FILM, BAMP1, OFFHT):
+        print("ojoj", currentHt)
         changeHt(currentHt - OFFHT)
     else:
         changeHt(currentHt - newHt)
