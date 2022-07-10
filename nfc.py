@@ -90,11 +90,11 @@ def run(arg):
     def vsxSet(val):
         time.sleep(ST1)
         if val == CD:
-            v.setCD()
             v.setVolume(VOL1)
+            v.setCD()
         elif val == NET:
-            v.setNET()
             v.setVolume(VOL3)
+            v.setNET()
             time.sleep(ST2)
             v.setEnter()
             time.sleep(ST1)
@@ -102,18 +102,18 @@ def run(arg):
             time.sleep(ST1)
             v.setEnter()
         elif val == FM:
+            v.setVolume(VOL1)
             v.setFM()
-            v.setVolume(VOL1)
         elif val == BD:
-            v.setBD()
             v.setVolume(VOL1)
+            v.setBD()
         elif val == SAT:
-            v.setSAT()
             v.setVolume(VOL2)
+            v.setSAT()
             t.setHdmi3()
         elif val == SB:
-            v.setSB()
             v.setVolume(VOL2)
+            v.setSB()
 
     deviceOn = [t.on, b.on, v.on, t.decoderOn, p.on, vsxSet]
     deviceOff = [tvOff, b.off, v.off, t.decoderOff, p.off, vsxSet]
