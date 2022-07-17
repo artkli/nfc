@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 from vsx import Vsx, CD, AM, NET, BT, FM, BD, TV, SAT, PC, SB
@@ -10,6 +11,30 @@ ST2 = 2.0
 VOL1 = 84
 VOL2 = 84
 VOL3 = 44
+
+FILE_SAT = "/home/pi/alexa/nfc-sat.lock"
+FILE_CD = "/home/pi/alexa/nfc-cd.lock"
+FILE_RADIO = "/home/pi/alexa/nfc-radio.lock"
+FILE_NET = "/home/pi/alexa/nfc-net.lock"
+FILE_FILM = "/home/pi/alexa/nfc-film.lock"
+FILE_PC = "/home/pi/alexa/nfc-pc.lock"
+FILE_OFF = ""
+
+FILE_LOCK = "/home/pi/nfc/app/nfc.lock"
+
+
+def setFile(file):
+    if file == FILE_OFF:
+        for f in (FILE_SAT, FILE_CD, FILE_RADIO, FILE_NET, FILE_FILM, FILE_PC):
+            if os.path.exists(f):
+                os.remove(f)
+    if not os.path.exists(file):
+        for f in (FILE_SAT, FILE_CD, FILE_RADIO, FILE_NET, FILE_FILM, FILE_PC):
+            if f == file:
+                open(f, 'x')
+            else:
+                if os.path.exists(f):
+                    os.remove(f)
 
 
 class HomeTheatre:
@@ -77,6 +102,13 @@ OFFHT = HomeTheatre(False, False, False, False, False, False)
 
 
 def run(arg):
+    mustend = time.time() + 30
+    while time.time() < mustend:
+        if not os.path.exists(FILE_LOCK):
+            break
+        time.sleep(0.5)
+    open(FILE_LOCK, 'x')
+
     v = Vsx()
     b = Bdp()
     t = Tv()
@@ -135,32 +167,44 @@ def run(arg):
 
     if arg == 'sat':
         newHt = TELEVISION
+        fn = FILE_SAT
     elif arg == 'cd':
         newHt = MUSIC
+        fn = FILE_CD
     elif arg == 'radio':
         newHt = RADIO
+        fn = FILE_RADIO
     elif arg == 'net':
         newHt = NETRADIO
+        fn = FILE_NET
     elif arg == 'film':
         newHt = FILM
+        fn = FILE_FILM
     elif arg == 'pc':
         newHt = BAMP1
+        fn = FILE_PC
     else:
         p.close()
         t.close()
         b.close()
         v.close()
+        if os.path.exists(FILE_LOCK):
+            os.remove(FILE_LOCK)
         sys.exit(1)
 
     if currentHt == newHt or currentHt not in (TELEVISION, MUSIC, RADIO, NETRADIO, FILM, BAMP1, OFFHT):
         changeHt(currentHt - OFFHT)
+        setFile(FILE_OFF)
     else:
         changeHt(currentHt - newHt)
+        setFile(fn)
 
     p.close()
     t.close()
     b.close()
     v.close()
+    if os.path.exists(FILE_LOCK):
+        os.remove(FILE_LOCK)
 
 
 if __name__ == "__main__":
