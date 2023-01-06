@@ -42,7 +42,7 @@ nfc.on('reader', async reader => {
             if (sdata.includes("POWER")) {
                 console.log(`${reader.reader.name}  POWER string found`);
 
-                const c = spawn('python3', ['/home/pi/nfc/app/nfc.py', 'sat']);
+                const c = spawn('sudo', ['python3', '/home/pi/nfc/app/nfc.py', 'sat']);
                 c.on('close', (code) => {
                         console.log(`SEND TV command, exit code ${code}`);
                 });
@@ -50,7 +50,7 @@ nfc.on('reader', async reader => {
             if (sdata.includes("PC")) {
                 console.log(`${reader.reader.name}  PC string found`);
 
-                const c = spawn('python3', ['/home/pi/nfc/app/nfc.py', 'pc']);
+                const c = spawn('sudo', ['python3', '/home/pi/nfc/app/nfc.py', 'pc']);
                 c.on('close', (code) => {
                         console.log(`SEND TV command, exit code ${code}`);
                 });
@@ -58,7 +58,7 @@ nfc.on('reader', async reader => {
             if (sdata.includes("TV")) {
                 console.log(`${reader.reader.name}  TV string found`);
 
-                const c = spawn('python3', ['/home/pi/nfc/app/nfc.py', 'sat']);
+                const c = spawn('sudo', ['python3', '/home/pi/nfc/app/nfc.py', 'sat']);
                 c.on('close', (code) => {
                         console.log(`SEND TV command, exit code ${code}`);
                 });
@@ -66,7 +66,7 @@ nfc.on('reader', async reader => {
             if (sdata.includes("FILM")) {
                 console.log(`${reader.reader.name}  FILM string found`);
 
-                const c = spawn('python3', ['/home/pi/nfc/app/nfc.py', 'film']);
+                const c = spawn('sudo', ['python3', '/home/pi/nfc/app/nfc.py', 'film']);
                 c.on('close', (code) => {
                         console.log(`SEND FILM command, exit code ${code}`);
                 });
@@ -74,7 +74,7 @@ nfc.on('reader', async reader => {
             if (sdata.includes("RADIO")) {
                 console.log(`${reader.reader.name}  RADIO string found`);
 
-                const c = spawn('python3', ['/home/pi/nfc/app/nfc.py', 'radio']);
+                const c = spawn('sudo', ['python3', '/home/pi/nfc/app/nfc.py', 'radio']);
                 c.on('close', (code) => {
                         console.log(`SEND RADIO command, exit code ${code}`);
                 });
@@ -82,17 +82,25 @@ nfc.on('reader', async reader => {
             if (sdata.includes("CD")) {
                 console.log(`${reader.reader.name}  CD string found`);
 
-                const c = spawn('python3', ['/home/pi/nfc/app/nfc.py', 'cd']);
+                const c = spawn('sudo', ['python3', '/home/pi/nfc/app/nfc.py', 'cd']);
                 c.on('close', (code) => {
                         console.log(`SEND CD command, exit code ${code}`);
                 });
             }
             if (sdata.includes("NET")) {
-                console.log(`${reader.reader.name}  CD string found`);
+                console.log(`${reader.reader.name}  NET string found`);
 
-                const c = spawn('python3', ['/home/pi/nfc/app/nfc.py', 'net']);
+                const c = spawn('sudo', ['python3', '/home/pi/nfc/app/nfc.py', 'net']);
                 c.on('close', (code) => {
-                        console.log(`SEND CD command, exit code ${code}`);
+                        console.log(`SEND NET command, exit code ${code}`);
+                });
+            }
+            if (sdata.includes("CANAL")) {
+                console.log(`${reader.reader.name}  NET string found`);
+
+                const c = spawn('sudo', ['python3', '/home/pi/nfc/app/nfc.py', 'canal']);
+                c.on('close', (code) => {
+                        console.log(`SEND CANAL command, exit code ${code}`);
                 });
             }
         } catch (err) {

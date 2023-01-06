@@ -1,35 +1,38 @@
 import os
 import sys
 import time
-from vsx import Vsx, CD, AM, NET, BT, FM, BD, TV, SAT, PC, SB
+from vsx import Vsx, CD, AM, NET, BT, FM, BD, TV, SAT, PC, SB, BT
 from bdp import Bdp
 from tv import Tv
 from pc import Pc
 
 ST1 = 1.0
 ST2 = 2.0
+STF = 0.1
+SFL = 45
 VOL1 = 84
 VOL2 = 84
 VOL3 = 44
 
-FILE_SAT = "/home/pi/alexa/nfc-sat.lock"
-FILE_CD = "/home/pi/alexa/nfc-cd.lock"
-FILE_RADIO = "/home/pi/alexa/nfc-radio.lock"
-FILE_NET = "/home/pi/alexa/nfc-net.lock"
-FILE_FILM = "/home/pi/alexa/nfc-film.lock"
-FILE_PC = "/home/pi/alexa/nfc-pc.lock"
+FILE_SAT = "/run/lock/nfc-sat.lock"
+FILE_CD = "/run/lock/nfc-cd.lock"
+FILE_RADIO = "/run/lock/nfc-radio.lock"
+FILE_NET = "/run/lock/nfc-net.lock"
+FILE_FILM = "/run/lock/nfc-film.lock"
+FILE_PC = "/run/lock/nfc-pc.lock"
+FILE_BT = "/run/lock/nfc-bt.lock"
 FILE_OFF = ""
 
-FILE_LOCK = "/home/pi/nfc/app/nfc.lock"
+FILE_LOCK = "/run/lock/nfc.lock"
 
 
 def setFile(file):
     if file == FILE_OFF:
-        for f in (FILE_SAT, FILE_CD, FILE_RADIO, FILE_NET, FILE_FILM, FILE_PC):
+        for f in (FILE_SAT, FILE_CD, FILE_RADIO, FILE_NET, FILE_FILM, FILE_PC, FILE_BT):
             if os.path.exists(f):
                 os.remove(f)
     if not os.path.exists(file):
-        for f in (FILE_SAT, FILE_CD, FILE_RADIO, FILE_NET, FILE_FILM, FILE_PC):
+        for f in (FILE_SAT, FILE_CD, FILE_RADIO, FILE_NET, FILE_FILM, FILE_PC, FILE_BT):
             if f == file:
                 open(f, 'x')
             else:
@@ -94,19 +97,19 @@ TELEVISION = HomeTheatre(True, False, True, True, False, SAT)
 MUSIC = HomeTheatre(False, True, True, False, False, CD)
 RADIO = HomeTheatre(False, False, True, False, False, FM)
 NETRADIO = HomeTheatre(False, False, True, False, False, NET)
+BLUETOOTH = HomeTheatre(False, False, True, False, False, BT)
 BAMP1 = HomeTheatre(True, False, True, False, True, SB)
 COMPUTER = HomeTheatre(True, False, True, False, False, PC)
 FILM = HomeTheatre(True, True, True, False, False, BD)
 TVAPP = HomeTheatre(True, False, True, False, False, TV)
 OFFHT = HomeTheatre(False, False, False, False, False, False)
 
-
 def run(arg):
-    mustend = time.time() + 30
+    mustend = time.time() + SFL
     while time.time() < mustend:
         if not os.path.exists(FILE_LOCK):
             break
-        time.sleep(0.5)
+        time.sleep(STF)
     open(FILE_LOCK, 'x')
 
     v = Vsx()
@@ -116,11 +119,13 @@ def run(arg):
 
     def tvOff():
         v.cecOff()
+        time.sleep(ST1)
         t.off()
+        time.sleep(ST1)
         v.cecOn()
 
     def vsxSet(val):
-        time.sleep(ST1)
+        v.cecOn()
         if val == CD:
             v.setVolume(VOL1)
             v.setCD()
@@ -136,6 +141,9 @@ def run(arg):
         elif val == FM:
             v.setVolume(VOL1)
             v.setFM()
+        elif val == BT:
+            v.setVolume(VOL1)
+            v.setBT()
         elif val == BD:
             v.setVolume(VOL1)
             v.setBD()
@@ -159,6 +167,7 @@ def run(arg):
             elif type(v) == str:
                 deviceOn[len(ht)-1](v)
 
+
     if v.isOn():
         vSource = v.getSource()
         currentHt = HomeTheatre(t.isOn(), b.isOn(), True, True if vSource == SAT else False, p.isOn(), vSource)
@@ -168,12 +177,17 @@ def run(arg):
     if arg == 'sat':
         newHt = TELEVISION
         fn = FILE_SAT
+    elif arg == 'canal':
+        vsxSet(SAT)
     elif arg == 'cd':
         newHt = MUSIC
         fn = FILE_CD
     elif arg == 'radio':
         newHt = RADIO
         fn = FILE_RADIO
+    elif arg == 'bt':
+        newHt = BLUETOOTH
+        fn = FILE_BT
     elif arg == 'net':
         newHt = NETRADIO
         fn = FILE_NET
@@ -192,7 +206,7 @@ def run(arg):
             os.remove(FILE_LOCK)
         sys.exit(1)
 
-    if currentHt == newHt or currentHt not in (TELEVISION, MUSIC, RADIO, NETRADIO, FILM, BAMP1, OFFHT):
+    if currentHt == newHt or currentHt not in (TELEVISION, MUSIC, RADIO, BLUETOOTH, NETRADIO, FILM, BAMP1, OFFHT):
         changeHt(currentHt - OFFHT)
         setFile(FILE_OFF)
     else:

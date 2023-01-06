@@ -18,11 +18,10 @@ STHOST = "api.smartthings.com"
 STPORT = 443
 
 ST1 = 0.5
-ST2 = 2.0
+ST2 = 1.0
 ST3 = 3.0
 ST4 = 10.0
 
-#VOL2 = 64
 VOL2 = 84
 
 class Tv:
@@ -36,13 +35,13 @@ class Tv:
         self.tvr = SamsungTVWS(host=TVHOST, port=TVPORT3, token_file=token_file)
 
     def __del__(self):
-        pass
+        self.tvr.close()
     
     close = __del__
 
     def __isPortOpen(self, ip=TVHOST, port=TVPORT1, timeout=ST4):
         try:
-            p = ping(DNSIP, count=1, timeout=ST2)
+            p = ping(DNSIP, count=1, timeout=ST3)
         except:
             return False
         if p.packets_received == 0:
@@ -145,13 +144,13 @@ class Tv:
             if decoder:
                 self.decoderOff()
             if self.online:
-                    asyncio.run(self.__off())
+                asyncio.run(self.__off())
             else:
-                    self.tvr.shortcuts().power()
-    
+                self.tvr.shortcuts().power()
+
     def setHdmi3(self):
         if self.isOn():
-            time.sleep(ST2)
+            time.sleep(ST3)
             self.tvr.send_key('KEY_HOME')
             time.sleep(ST1)
             self.tvr.send_key('KEY_RIGHT')
@@ -171,7 +170,6 @@ if __name__ == "__main__":
     t = Tv()
     print(t.foundTv())
     print("TV is ON" if t.isOn() else "TV is OFF")
-    """
     print("starting ...")
     t.on(False)
     print("HDMI3 ...")
@@ -183,5 +181,4 @@ if __name__ == "__main__":
     t.off(False)
     time.sleep(10)
     print("TV is ON" if t.isOn() else "TV is OFF")
-    """
     t.close()

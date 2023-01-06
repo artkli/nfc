@@ -71,14 +71,14 @@ class Vsx:
 
     def cecOn(self):
         if "off" in self.dev.command("hdmi-cec query"):
-            time.sleep(ST3)
+            time.sleep(ST2)
             return self.dev.command("hdmi-cec on")
         else:
             return "on"
 
     def cecOff(self):
         if "on" in self.dev.command("hdmi-cec query"):
-            time.sleep(ST3)
+            time.sleep(ST2)
             return self.dev.command("hdmi-cec off")
         else:
             return "off"
