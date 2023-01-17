@@ -9,7 +9,7 @@ from pc import Pc
 ST1 = 1.0
 ST2 = 2.0
 STF = 0.1
-SFL = 45
+SFL = 30
 VOL1 = 84
 VOL2 = 84
 VOL3 = 44

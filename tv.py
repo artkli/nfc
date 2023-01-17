@@ -110,7 +110,6 @@ class Tv:
                     return False
                 if time.time() - start_time > ST4:
                     return False
-                time.sleep(ST1)            
 
     def decoderOn(self):
         try:
@@ -129,15 +128,8 @@ class Tv:
 
         if self.online:
             asyncio.run(self.__on())
-
-        start_time = time.time()
-        while True:
-            wakeonlan.send_magic_packet(TVARP)
-            time.sleep(ST1)
-            if self.isOn():
-                return True
-            if time.time() - start_time > ST4:
-                return False
+        
+        wakeonlan.send_magic_packet(TVARP)
 
     def off(self, decoder=False):
         if self.isOn():
@@ -150,7 +142,7 @@ class Tv:
 
     def setHdmi3(self):
         if self.isOn():
-            time.sleep(ST3)
+            time.sleep(ST4)
             self.tvr.send_key('KEY_HOME')
             time.sleep(ST1)
             self.tvr.send_key('KEY_RIGHT')

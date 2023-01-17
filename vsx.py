@@ -51,7 +51,6 @@ class Vsx:
     def on(self):
         if not self.isOn():
             if "on" in self.dev.command("power on"):
-#                time.sleep(ST2)
                 return True
             else:
                 return False
