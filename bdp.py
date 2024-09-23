@@ -42,17 +42,21 @@ class Bdp:
     def __init__(self, host=BDHOST, port=BDPORT):
         self.host = host
         self.port = port
-        self.ok = True
-        try:
-            self.dev = telnetlib.Telnet(self.host, self.port)
-        except:
-            self.ok = False            
+        self.ok = False
+        self.__connect()
 
     def __del__(self):
         if self.ok:
             self.dev.close()
 
     close = __del__
+
+    def __connect(self):
+        self.ok = True
+        try:
+            self.dev = telnetlib.Telnet(self.host, self.port)
+        except:
+            self.ok = False       
 
     def __send(self, command):
         self.dev.write(command)
@@ -135,6 +139,7 @@ class Bdp:
             return self.__send(PLAY)
 
     def status(self):
+        self.__connect()
         self.dev.write(MODE)
         time.sleep(ST1)
         answer = self.dev.read_until(b"\n", ST6).decode("UTF-8")

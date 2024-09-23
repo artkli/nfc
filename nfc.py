@@ -1,10 +1,17 @@
 import os
 import sys
 import time
+
+from datetime import datetime
+from influxdb import InfluxDBClient
+
 from vsx import Vsx, CD, AM, NET, BT, FM, BD, TV, SAT, PC, SB, BT
 from bdp import Bdp
 from tv import Tv
 from pc import Pc
+from led import Led
+from h import USER, DB, PASS, DEBUG
+
 
 ST1 = 1.0
 ST2 = 2.0
@@ -25,19 +32,41 @@ FILE_OFF = ""
 
 FILE_LOCK = "/run/lock/nfc.lock"
 
+currentFuncName = lambda n=0: sys._getframe(n + 1).f_code.co_name
 
 def setFile(file):
+    if DEBUG:
+        print(f"[NFC] o {datetime.now()} jestem w funkcji {currentFuncName()} wywołanej z {currentFuncName(1)}")
+    vd = 0
     if file == FILE_OFF:
         for f in (FILE_SAT, FILE_CD, FILE_RADIO, FILE_NET, FILE_FILM, FILE_PC, FILE_BT):
             if os.path.exists(f):
                 os.remove(f)
-    if not os.path.exists(file):
-        for f in (FILE_SAT, FILE_CD, FILE_RADIO, FILE_NET, FILE_FILM, FILE_PC, FILE_BT):
-            if f == file:
+    for c, f in enumerate([FILE_SAT, FILE_CD, FILE_RADIO, FILE_NET, FILE_FILM, FILE_PC, FILE_BT]):
+        if f == file:
+            vd = c + 1
+            if not os.path.exists(file):
                 open(f, 'x')
-            else:
-                if os.path.exists(f):
-                    os.remove(f)
+        else:
+            if os.path.exists(f):
+                os.remove(f)
+
+    v = Vsx()
+    if v.isOn() and v.getSource() == TV:
+        vd = 8
+    v.close()
+
+    data = [{
+        "measurement": "home",
+        "time": datetime.now(),
+        "fields": {
+            "value": vd
+        }
+    }]
+    client = InfluxDBClient('localhost', 8086, USER, PASS, DB)
+    client.switch_database(DB)
+    client.write_points(data)
+    client.close()
 
 
 class HomeTheatre:
@@ -105,6 +134,11 @@ TVAPP = HomeTheatre(True, False, True, False, False, TV)
 OFFHT = HomeTheatre(False, False, False, False, False, False)
 
 def run(arg):
+    l = Led()
+    l.on()
+
+    if DEBUG:
+        print(f"[NFC] o {datetime.now()} jestem w funkcji {currentFuncName()} wywołanej z {currentFuncName(1)}")
     mustend = time.time() + SFL
     while time.time() < mustend:
         if not os.path.exists(FILE_LOCK):
@@ -118,55 +152,76 @@ def run(arg):
     p = Pc()
 
     def tvOff():
+        if DEBUG:
+            print(f"[NFC] o {datetime.now()} jestem w funkcji {currentFuncName()} wywołanej z {currentFuncName(1)}")
         v.cecOff()
         time.sleep(ST1)
         t.off()
-        time.sleep(ST1)
+        time.sleep(ST2)
         v.cecOn()
+        time.sleep(ST1)
+
+    def tvOn():
+        if DEBUG:
+            print(f"[NFC] o {datetime.now()} jestem w funkcji {currentFuncName()} wywołanej z {currentFuncName(1)}")
+        t.on()
+        time.sleep(ST2)
 
     def vsxSet(val):
+        if DEBUG:
+            print(f"[NFC] o {datetime.now()} jestem w funkcji {currentFuncName()} wywołanej z {currentFuncName(1)}")
         v.cecOn()
         if val == CD:
-            v.setVolume(VOL1)
             v.setCD()
+            v.setVolume(VOL1)
+            v.setStereo()
         elif val == NET:
-            v.setVolume(VOL3)
             v.setNET()
+            v.setVolume(VOL3)
             time.sleep(ST2)
             v.setEnter()
             time.sleep(ST1)
             v.setEnter()
             time.sleep(ST1)
             v.setEnter()
+            v.setStereo()
         elif val == FM:
-            v.setVolume(VOL1)
             v.setFM()
+            v.setVolume(VOL1)
+            v.setStereo()
         elif val == BT:
-            v.setVolume(VOL1)
             v.setBT()
-        elif val == BD:
             v.setVolume(VOL1)
+            v.setDolby()
+        elif val == BD:
             v.setBD()
+            v.setVolume(VOL1)
+            v.setDolby()
         elif val == SAT:
+            v.setSAT()         
             v.setVolume(VOL2)
-            v.setSAT()
+            v.setDolby()
             t.setHdmi3()
         elif val == SB:
-            v.setVolume(VOL2)
             v.setSB()
+            v.setVolume(VOL2)
+            v.setDolby()
 
-    deviceOn = [t.on, b.on, v.on, t.decoderOn, p.on, vsxSet]
+    # deviceOn = [t.on, b.on, v.on, t.decoderOn, p.on, vsxSet]
+    deviceOn = [tvOn, b.on, v.on, t.decoderOn, p.on, vsxSet]
     deviceOff = [tvOff, b.off, v.off, t.decoderOff, p.off, vsxSet]
 
     def changeHt(ht):
-        for i, v in enumerate(ht):
-            if v == -1:
+        if DEBUG:
+            print(f"[NFC] o {datetime.now()} jestem w funkcji {currentFuncName()} wywołanej z {currentFuncName(1)}")
+            print(f"[NFC] o {datetime.now()} ht {ht}")
+        for i, value in enumerate(ht):
+            if value == -1:
                 deviceOff[i]()
-            elif v == 1:
+            elif value == 1:
                 deviceOn[i]()
-            elif type(v) == str:
-                deviceOn[len(ht)-1](v)
-
+            elif type(value) == str:
+                deviceOn[len(ht)-1](value)
 
     if v.isOn():
         vSource = v.getSource()
@@ -217,8 +272,12 @@ def run(arg):
     t.close()
     b.close()
     v.close()
+
     if os.path.exists(FILE_LOCK):
         os.remove(FILE_LOCK)
+
+    l.off()
+    l.close()
 
 
 if __name__ == "__main__":

@@ -96,7 +96,7 @@ nfc.on('reader', async reader => {
                 });
             }
             if (sdata.includes("CANAL")) {
-                console.log(`${reader.reader.name}  NET string found`);
+                console.log(`${reader.reader.name}  CANAL string found`);
 
                 const c = spawn('sudo', ['python3', '/home/pi/nfc/app/nfc.py', 'canal']);
                 c.on('close', (code) => {
