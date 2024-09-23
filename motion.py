@@ -18,6 +18,7 @@ PASS = 'pep'
 PATH_LOCK = FILE_LOCK[:FILE_LOCK.rfind("/")]
 FLAG = True
 START = False
+DEBUG = False
 
 
 def save_motion(state):
@@ -51,14 +52,19 @@ def save_start(state):
 
 
 def mes(s):
-    journal.write(s)
-    logging.info(s)
+    if DEBUG == True:
+        journal.write(s)
+        logging.info(s)
+    else:
+        pass
 
 
-def on_message(mqttc, obj, msg):
+def on_message_org(mqttc, obj, msg):
     global FLAG, START
     c1 = 0
     c2 = 0
+
+    time.sleep(0.3)
     mustend = time.time() + 200
     while time.time() < mustend:
         if FLAG:
@@ -97,7 +103,14 @@ def on_message(mqttc, obj, msg):
     FLAG = True
 
 
-logging.basicConfig(filename='/home/pi/nfc/app/motion.log', level=logging.INFO, format='%(asctime)s - %(message)s')
+def on_message(mqttc, obj, msg):
+    
+    j = json.loads(str(msg.payload.decode("utf-8","ignore")))
+    save_motion(j["occupancy"])
+
+
+if DEBUG == True:
+    logging.basicConfig(filename='/home/pi/nfc/app/motion.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 mqttc = mqtt.Client()
 mqttc.on_message = on_message
 mqttc.connect("127.0.0.1", 1883, 60)
