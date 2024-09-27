@@ -144,6 +144,9 @@ def run(arg):
         if not os.path.exists(FILE_LOCK):
             break
         time.sleep(STF)
+        l.off()
+        time.sleep(STF)
+        l.on()
     open(FILE_LOCK, 'x')
 
     v = Vsx()
